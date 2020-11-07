@@ -76,26 +76,26 @@ resource "nsxt_policy_vlan_segment" "vlan-uplink" {
 
 
 }
-# resource "nsxt_policy_tier0_gateway_interface" "Uplink-01" {
-#   display_name           = "Uplink-01"
-#   description            = "Uplink-01"
-#   type                   = "EXTERNAL"
-#   gateway_path           = nsxt_policy_tier0_gateway.Prod-T0-01.path
-#   segment_path           = nsxt_policy_vlan_segment.vlan-uplink.path
-#   edge_node_path         = data.nsxt_policy_edge_node.ESG-NSXT-03.path
-#   subnets                = ["10.0.1.100/24"]
-#   mtu                    = 9000
-# }
-# resource "nsxt_policy_tier0_gateway_interface" "Uplink-02" {
-#   display_name           = "Uplink-02"
-#   description            = "Uplink-02"
-#   type                   = "EXTERNAL"
-#   gateway_path           = nsxt_policy_tier0_gateway.Prod-T0-01.path
-#   segment_path           = nsxt_policy_vlan_segment.vlan-uplink.path
-#   edge_node_path         = data.nsxt_policy_edge_node.ESG-NSXT-04.path
-#   subnets                = ["10.0.1.101/24"]
-#   mtu                    = 9000
-# }
+resource "nsxt_policy_tier0_gateway_interface" "Uplink-01" {
+   display_name           = "Uplink-01"
+   description            = "Uplink-01"
+   type                   = "EXTERNAL"
+   gateway_path           = nsxt_policy_tier0_gateway.Prod-T0-01.path
+   segment_path           = nsxt_policy_vlan_segment.vlan-uplink.path
+   edge_node_path         = data.nsxt_policy_edge_node.ESG-NSXT-03.path
+   subnets                = ["10.0.1.100/24"]
+   mtu                    = 9000
+ }
+resource "nsxt_policy_tier0_gateway_interface" "Uplink-02" {
+   display_name           = "Uplink-02"
+   description            = "Uplink-02"
+   type                   = "EXTERNAL"
+   gateway_path           = nsxt_policy_tier0_gateway.Prod-T0-01.path
+  segment_path           = nsxt_policy_vlan_segment.vlan-uplink.path
+     edge_node_path         = data.nsxt_policy_edge_node.ESG-NSXT-04.path
+  subnets                = ["10.0.1.101/24"]
+  mtu                    = 9000
+}
 
 
 resource "nsxt_policy_tier0_gateway" "Prod-T0-01" {
@@ -182,23 +182,7 @@ resource "nsxt_policy_segment" "Home" {
     cidr = "10.0.100.1/24"
   }
 }
-resource "nsxt_policy_segment" "Pentest" {
-  display_name        = "Pentest"
-  description         = "Pentest"
-  connectivity_path   = nsxt_policy_tier1_gateway.Prod-T1-01.path
-  transport_zone_path = data.nsxt_policy_transport_zone.std-overlay-01.path
-   subnet {
-    cidr        = "10.1.101.1/24"
-    dhcp_ranges = ["10.1.101.3-10.1.101.251"]
-    dhcp_v4_config {
-      server_address = "10.1.101.2/24"
-      lease_time     = 36000
-    }
-  }
-  security_profile {
-    security_profile_path   = data.nsxt_policy_segment_security_profile.dhcp_allow.path
-  }
-}
+
 
 resource "nsxt_policy_dhcp_server" "build" {
   display_name      = "build"
@@ -228,21 +212,6 @@ resource "nsxt_policy_segment" "build" {
   }
 }
 
-resource "nsxt_policy_segment" "k8s" {
-  display_name        = "k8s"
-  description         = "k8s"
-  connectivity_path   = nsxt_policy_tier1_gateway.Prod-T1-01.path
-  transport_zone_path = data.nsxt_policy_transport_zone.std-overlay-01.path
-  depends_on          = [nsxt_policy_tier1_gateway.Prod-T1-01]
-  subnet {
-    cidr        = "10.2.1.1/24"
-    dhcp_ranges = ["10.2.1.3-10.2.1.100"]
-    dhcp_v4_config {
-      server_address = "10.2.1.2/24"
-      lease_time     = 36000
-    }
-  }
 
-}
 
 
