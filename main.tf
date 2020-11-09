@@ -1,17 +1,14 @@
-
-
-
 data "nsxt_policy_edge_cluster" "EGS-MAIN-Cluster" {
   display_name = "EGS-MAIN-Cluster"
 }
 
-data "nsxt_policy_edge_node" "ESG-NSXT-01" {
+data "nsxt_policy_edge_node" "EGS-NSXT-01" {
   edge_cluster_path = data.nsxt_policy_edge_cluster.EGS-MAIN-Cluster.path
-  display_name      = "ESG-NSXT-01"
+  display_name      = "EGS-NSX-01"
 }
-data "nsxt_policy_edge_node" "ESG-NSXT-02" {
+data "nsxt_policy_edge_node" "EGS-NSXT-02" {
   edge_cluster_path = data.nsxt_policy_edge_cluster.EGS-MAIN-Cluster.path
-  display_name      = "ESG-NSXT-02"
+  display_name      = "EGS-NSX-02"
 }
 data "nsxt_policy_transport_zone" "std-overlay-01" {
   display_name   = "nsx-overlay-transportzone"
@@ -27,7 +24,7 @@ data "nsxt_policy_segment_security_profile" "dhcp_allow" {
 }
 resource "nsxt_policy_ip_pool" "transport" {
   display_name = "Transport Nodes"
-  nsx_id       = "Transport_Nodes"
+  nsx_id       = "Transport-Nodes"
 
 }
 
@@ -82,7 +79,7 @@ resource "nsxt_policy_tier0_gateway_interface" "Uplink-01" {
    type                   = "EXTERNAL"
    gateway_path           = nsxt_policy_tier0_gateway.Prod-T0-01.path
    segment_path           = nsxt_policy_vlan_segment.vlan-uplink.path
-   edge_node_path         = data.nsxt_policy_edge_node.ESG-NSXT-03.path
+   edge_node_path         = data.nsxt_policy_edge_node.EGS-NSXT-01.path
    subnets                = ["10.0.1.100/24"]
    mtu                    = 9000
  }
@@ -92,7 +89,7 @@ resource "nsxt_policy_tier0_gateway_interface" "Uplink-02" {
    type                   = "EXTERNAL"
    gateway_path           = nsxt_policy_tier0_gateway.Prod-T0-01.path
   segment_path           = nsxt_policy_vlan_segment.vlan-uplink.path
-     edge_node_path         = data.nsxt_policy_edge_node.ESG-NSXT-04.path
+     edge_node_path         = data.nsxt_policy_edge_node.EGS-NSXT-02.path
   subnets                = ["10.0.1.101/24"]
   mtu                    = 9000
 }
@@ -120,6 +117,14 @@ resource "nsxt_policy_tier0_gateway" "Prod-T0-01" {
     graceful_restart_stale_route_timer = 600
 
   }
+  redistribution_config {
+    enabled = true
+    rule {
+      name  = "Main"
+      types = ["TIER0_STATIC","TIER0_CONNECTED","TIER0_EXTERNAL_INTERFACE","TIER0_SEGMENT","TIER0_ROUTER_LINK", "TIER0_SERVICE_INTERFACE", "TIER0_LOOPBACK_INTERFACE", "TIER0_DNS_FORWARDER_IP", "TIER0_IPSEC_LOCAL_IP", "TIER0_NAT", "TIER0_EVPN_TEP_IP", "TIER1_NAT", "TIER1_STATIC", "TIER1_LB_VIP", "TIER1_LB_SNAT", "TIER1_DNS_FORWARDER_IP", "TIER1_CONNECTED", "TIER1_SERVICE_INTERFACE", "TIER1_SEGMENT", "TIER1_IPSEC_LOCAL_ENDPOINT"]
+    }
+  }
+
 }
 
 
